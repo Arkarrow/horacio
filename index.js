@@ -13,7 +13,7 @@ const s3 = new AWS.S3({
   endpoint: process.env.S3_end, // L'URL de l'endpoint Clever Cloud
   s3ForcePathStyle: true, // Nécessaire pour certains services compatibles S3
 });
-const BUCKET_NAME = "JULES_AIME_PAS_STARWARS"; // Le nom de votre bucket
+const BUCKET_NAME = "deded_JULES_AIME_PAS_STARWARS"; // Le nom de votre bucket
 
 // Middleware pour parser les requêtes JSON
 app.use(bodyParser.json());
