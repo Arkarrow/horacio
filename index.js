@@ -4,7 +4,7 @@ const AWS = require("aws-sdk");
 const fs = require("fs");
 const path = require("path");
 const app = express();
-const PORT = 3000;
+const PORT = 8080;
 
 // Configuration AWS S3 (remplacez par vos propres informations Clever Cloud)
 const s3 = new AWS.S3({
