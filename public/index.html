@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bucket Manager</title>
+    <script>
+      async function createItem() {
+        const name = document.getElementById("name").value;
+        const description = document.getElementById("description").value;
+        if (!name || !description) {
+          alert("Name and description are required!");
+          return;
+        }
+        const response = await fetch("/api/items", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            description,
+          }),
+        });
+        if (response.ok) {
+          alert("Item created successfully!");
+          loadItems();
+        } else {
+          alert("Failed to create item");
+        }
+      }
+
+      async function loadItems() {
+        const response = await fetch("/api/items");
+        const data = await response.json();
+        const list = document.getElementById("items");
+        list.innerHTML = "";
+        if (data.items && data.items.length > 0) {
+          data.items.forEach((item) => {
+            const li = document.createElement("li");
+            li.textContent = item;
+            li.onclick = () => loadItemContent(item);
+            list.appendChild(li);
+          });
+        } else {
+          list.innerHTML = "<li>No items found</li>";
+        }
+      }
+
+      async function loadItemContent(fileName) {
+        const response = await fetch(`/api/items/${fileName}`);
+        const data = await response.json();
+        const contentDisplay = document.getElementById("content");
+        if (response.ok) {
+          contentDisplay.textContent = data.content;
+        } else {
+          contentDisplay.textContent = "Failed to load content";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", loadItems);
+    </script>
+  </head>
+
+  <body>
+    <h1>Bucket Manager</h1>
+    <div>
+      <h2>Create Item</h2>
+      <input type="text" id="name" placeholder="Name" required />
+      <input type="text" id="description" placeholder="Description" required />
+      <button onclick="createItem()">Create</button>
+    </div>
+    <div>
+      <h2>Items</h2>
+      <ul id="items"></ul>
+    </div>
+    <div>
+      <h2>Content</h2>
+      <pre id="content">Select a file to see its content</pre>
+    </div>
+  </body>
+</html>
