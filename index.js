@@ -1,155 +1,142 @@
 const express = require("express");
+const multer = require("multer");
+const {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+  ListObjectsCommand,
+} = require("@aws-sdk/client-s3");
 const bodyParser = require("body-parser");
-const AWS = require("aws-sdk");
-const fs = require("fs");
 const path = require("path");
+const mysql = require("mysql2/promise");
+
 const app = express();
 const PORT = 8080;
+const BUCKET_NAME = "deded_JULES_AIME_PAS_STARWARS";
 
-// Configuration AWS S3 (remplacez par vos propres informations Clever Cloud)
-const s3 = new AWS.S3({
-  accessKeyId: process.env.S3_access, // Votre clé d'accès Clever Cloud
-  secretAccessKey: process.env.S3_secret, // Votre clé secrète Clever Cloud
-  endpoint: process.env.S3_end, // L'URL de l'endpoint Clever Cloud
-  s3ForcePathStyle: true, // Nécessaire pour certains services compatibles S3
+// S3 Configuration
+const endpoint = process.env.S3_end;
+const accessKeyId = process.env.S3_access;
+const secretAccessKey = process.env.S3_secret;
+
+const s3 = new S3Client({
+  endpoint,
+  region: "us-east-1",
+  credentials: {
+    accessKeyId,
+    secretAccessKey,
+  },
 });
-const BUCKET_NAME = "deded_JULES_AIME_PAS_STARWARS"; // Le nom de votre bucket
 
-// Middleware pour parser les requêtes JSON
+// MySQL Configuration
+const MYSQL_URI = process.env.MYSQL_ADDON_URI;
+
+// Middleware to parse JSON request bodies
 app.use(bodyParser.json());
-app.use("/", express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public")));
 
-// Générer un nouvel ID unique
-const generateId = () => {
-  return Date.now();
-};
+// Configure multer for file uploads
+const upload = multer({ storage: multer.memoryStorage() });
 
-// Vérifier si le bucket existe, sinon le créer
-const ensureBucketExists = async () => {
+// POST: Upload an image
+app.post("/upload", upload.single("image"), async (req, res) => {
+  const { tags } = req.body;
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).json({ error: "No file uploaded." });
+  }
+
+  const filename = `${Date.now()}-${file.originalname}`;
+
   try {
-    await s3.headBucket({ Bucket: BUCKET_NAME }).promise();
-    console.log(`Bucket ${BUCKET_NAME} already exists.`);
-  } catch (error) {
-    if (error.statusCode === 404) {
-      console.log(`Bucket ${BUCKET_NAME} does not exist. Creating it...`);
-      await s3.createBucket({ Bucket: BUCKET_NAME }).promise();
-      console.log(`Bucket ${BUCKET_NAME} created successfully.`);
-    } else {
-      throw error;
+    // Upload file to S3
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: filename,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      })
+    );
+
+    // Store metadata in MySQL
+    const connection = await mysql.createConnection(MYSQL_URI);
+    if (tags && tags.length) {
+      const tagArray = tags.split(",");
+      for (const tag of tagArray) {
+        await connection.query(
+          "INSERT INTO files (tag, filename) VALUES (?, ?)",
+          [tag.trim(), filename]
+        );
+      }
     }
-  }
-};
+    await connection.end();
 
-// Fonction pour créer un fichier .txt et l'envoyer au bucket
-const uploadToBucket = async (fileName, content) => {
-  const filePath = path.join(__dirname, fileName);
-
-  // Vérifier et créer le bucket si nécessaire
-  await ensureBucketExists();
-
-  // Écrire le contenu dans un fichier local
-  fs.writeFileSync(filePath, content);
-
-  // Lire le fichier pour l'envoyer à S3
-  const fileContent = fs.readFileSync(filePath);
-
-  // Paramètres pour l'envoi au bucket
-  const params = {
-    Bucket: BUCKET_NAME,
-    Key: fileName,
-    Body: fileContent,
-    ContentType: "text/plain",
-  };
-
-  // Envoi au bucket
-  await s3.upload(params).promise();
-
-  // Supprimer le fichier local après l'envoi
-  fs.unlinkSync(filePath);
-};
-
-// Fonction pour récupérer tous les fichiers du bucket
-const listBucketItems = async () => {
-  try {
-    const params = {
-      Bucket: BUCKET_NAME,
-    };
-    const data = await s3.listObjectsV2(params).promise();
-    return data.Contents.map((item) => item.Key);
-  } catch (error) {
-    console.error("Error listing bucket items:", error);
-    throw new Error("Failed to list bucket items");
-  }
-};
-
-const getBucketItemContent = async (key) => {
-  try {
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: key, // La bonne syntaxe
-    };
-    const data = await s3.getObject(params).promise(); // Utiliser getObject pour obtenir l'objet
-    return data.Body.toString("utf-8"); // Convertir en texte et retourner le contenu
-  } catch (error) {
-    console.error("Error getting file content:", error);
-    throw new Error("Failed to get file content");
-  }
-};
-
-// Routes CRUD
-
-// CREATE - Ajouter un nouvel item et envoyer un fichier au bucket
-app.post("/api/items", async (req, res) => {
-  const { name, description } = req.body;
-  if (!name || !description) {
-    console.log("Impossible to create, missing params");
-    return res.status(400).json({ error: "Name and description are required" });
-  }
-  const id = generateId();
-  const newItem = { id, name, description };
-
-  // Générer le contenu du fichier .txt
-  const fileContent = `ID: ${id}\nName: ${name}\nDescription: ${description}`;
-  const fileName = `item-${id}.txt`;
-
-  try {
-    await uploadToBucket(fileName, fileContent);
-    console.log("File uploaded successfully: " + fileName);
-    res.status(201).json(newItem);
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    res.status(500).json({ error: "Failed to upload file to bucket" });
+    res.status(201).json({ message: "File uploaded successfully", filename });
+  } catch (err) {
+    console.error("Error uploading file:", err);
+    res.status(500).json({ error: "Failed to upload file." });
   }
 });
 
-// READ - Récupérer tous les items
-app.get("/api/items", async (req, res) => {
+// GET: Retrieve all uploaded images
+app.get("/images", async (req, res) => {
   try {
-    const items = await listBucketItems();
-    console.log("retrieve all data");
-    res.json({ items });
-  } catch (error) {
-    console.log("Failed to retrieve items from bucket");
-    res.status(500).json({ error: "Failed to retrieve items from bucket" });
+    const connection = await mysql.createConnection(MYSQL_URI);
+    const [rows] = await connection.query(
+      "SELECT filename, tag, created_at FROM files"
+    );
+    await connection.end();
+
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error("Error fetching images:", err);
+    res.status(500).json({ error: "Failed to fetch images." });
   }
 });
 
-// READ - Récupérer le contenu d'un fichier
-app.get("/api/items/:fileName", async (req, res) => {
-  const { fileName } = req.params;
+// GET: Retrieve a single image
+app.get("/images/:filename", async (req, res) => {
+  const { filename } = req.params;
+
   try {
-    const content = await getBucketItemContent(fileName); // Appel de la fonction corrigée pour récupérer le contenu
-    console.log("Retrieve item from bucket: " + fileName);
-    res.json({ content }); // Retourne le contenu au client
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Failed to retrieve file content" });
+    const data = await s3.send(
+      new GetObjectCommand({ Bucket: BUCKET_NAME, Key: filename })
+    );
+
+    res.setHeader("Content-Type", data.ContentType);
+    data.Body.pipe(res);
+  } catch (err) {
+    console.error("Error retrieving image:", err);
+    res.status(500).json({ error: "Failed to retrieve image." });
   }
 });
 
-// Démarrer le serveur
+// DELETE: Delete an image
+app.delete("/images/:filename", async (req, res) => {
+  const { filename } = req.params;
+  ç;
+  try {
+    // Delete from S3
+    await s3.send(
+      new DeleteObjectCommand({ Bucket: BUCKET_NAME, Key: filename })
+    );
+
+    // Delete metadata from MySQL
+    const connection = await mysql.createConnection(MYSQL_URI);
+    await connection.query("DELETE FROM files WHERE filename = ?", [filename]);
+    await connection.end();
+
+    res.status(200).json({ message: "Image deleted successfully." });
+  } catch (err) {
+    console.error("Error deleting image:", err);
+    res.status(500).json({ error: "Failed to delete image." });
+  }
+});
+
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
-
-// Création d'une interface utilisateur dans /public/index.html
