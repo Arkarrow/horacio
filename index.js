@@ -102,6 +102,7 @@ const getBucketItemContent = async (key) => {
 app.post("/api/items", async (req, res) => {
   const { name, description } = req.body;
   if (!name || !description) {
+    console.log("Impossible to create, missing params");
     return res.status(400).json({ error: "Name and description are required" });
   }
   const id = generateId();
@@ -113,6 +114,7 @@ app.post("/api/items", async (req, res) => {
 
   try {
     await uploadToBucket(fileName, fileContent);
+    console.log("File uploaded successfully: " + fileName);
     res.status(201).json(newItem);
   } catch (error) {
     console.error("Error uploading file:", error);
@@ -124,8 +126,10 @@ app.post("/api/items", async (req, res) => {
 app.get("/api/items", async (req, res) => {
   try {
     const items = await listBucketItems();
+    console.log("retrieve all data");
     res.json({ items });
   } catch (error) {
+    console.log("Failed to retrieve items from bucket");
     res.status(500).json({ error: "Failed to retrieve items from bucket" });
   }
 });
@@ -135,6 +139,7 @@ app.get("/api/items/:fileName", async (req, res) => {
   const { fileName } = req.params;
   try {
     const content = await getBucketItemContent(fileName); // Appel de la fonction corrigée pour récupérer le contenu
+    console.log("Retrieve item from bucket: " + fileName);
     res.json({ content }); // Retourne le contenu au client
   } catch (error) {
     console.log(error);
