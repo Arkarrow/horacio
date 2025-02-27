@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-    TWILIO_ACCOUNT_SID: 'SK0cd6bf1b9dcac779867f2b4c2a993afe'
+    TWILIO_ACCOUNT_SID: 'AC0becd613ff59be48cf4c44a6237f034c'
     TWILIO_AUTH_TOKEN: '3dc588b3b4f781b485f437dda7dfb9f6'
     TWILIO_API_SECRET: 'Q6rwoE2b4mvUA27SCBu0CAOyqj9vesxN'
 
