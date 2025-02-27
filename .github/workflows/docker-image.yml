@@ -9,7 +9,7 @@ on:
 env:
     TWILIO_ACCOUNT_SID: 'AC0becd613ff59be48cf4c44a6237f034c'
     TWILIO_AUTH_TOKEN: 'f23f69509a0bc7ab4babe060361f03b4'
-    TWILIO_API_SECRET: 'EDpk8Yjd0hUu4oAE0LC9n6jWVatohwEs'
+    TWILIO_API_SECRET: 'XkPW7nYaews9IirqYm4QWaj8j1OS6dXy'
 
 permissions:
   contents: read
@@ -38,7 +38,4 @@ jobs:
         with:
           fromPhoneNumber: '+14342150291'
           toPhoneNumber: '+33783601717'
-          message: 'Salut bg le build de my-horacio est sur le repos'
-          TWILIO_ACCOUNT_SID: 'AC0becd613ff59be48cf4c44a6237f034c'
-          TWILIO_AUTH_TOKEN: 'f23f69509a0bc7ab4babe060361f03b4'
-          TWILIO_API_SECRET: 'EDpk8Yjd0hUu4oAE0LC9n6jWVatohwEs'
+          message: 'Salut bg le build de my-horacio est sur le repos' 
