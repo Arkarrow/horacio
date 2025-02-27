@@ -28,7 +28,7 @@ jobs:
 
       - name: Build l'image Docker
         run: |
-          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/my-horacio"
+          IMAGE_NAME="ghcr.io/arkarrow/my-horacio"
           IMAGE_TAG="$(date +%s)"
           docker build . --file Dockerfile --tag $IMAGE_NAME:$IMAGE_TAG
           docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
