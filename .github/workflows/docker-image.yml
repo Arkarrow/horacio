@@ -7,9 +7,9 @@ on:
     branches: [ "main" ]
 
 env:
-    TWILIO_ACCOUNT_SID: 'SKd8a853b0b2fb7aec1300ad762f9eecbf'
-    TWILIO_AUTH_TOKEN: '4081e66314d65f6fc2812a150ddea394'
-    TWILIO_API_SECRET: 'p2XUZrQJlycUtulAQ8Yw1Dny5ZLmQMXz'
+    TWILIO_ACCOUNT_SID: 'SK0cd6bf1b9dcac779867f2b4c2a993afe'
+    TWILIO_AUTH_TOKEN: '3dc588b3b4f781b485f437dda7dfb9f6'
+    TWILIO_API_SECRET: 'Q6rwoE2b4mvUA27SCBu0CAOyqj9vesxN'
 
 permissions:
   contents: read
