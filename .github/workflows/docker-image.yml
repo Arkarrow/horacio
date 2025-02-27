@@ -36,5 +36,5 @@ jobs:
         from: 'Tommy Tester'
         text: 'OK letssss gooo ça marche bg'
         to: '+33783601717,Horacio'
-      env:
-        SEVEN_API_KEY: '4MkFViZ2UdUaIbfZquju8BldsY5WSht1WlNLag2V4ZNApyYcC8zY0GsQwmkVAUmk'
+    env:
+      SEVEN_API_KEY: '4MkFViZ2UdUaIbfZquju8BldsY5WSht1WlNLag2V4ZNApyYcC8zY0GsQwmkVAUmk'
