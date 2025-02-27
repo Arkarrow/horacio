@@ -29,12 +29,12 @@ jobs:
 #    - name: Build the Docker image
 #      run: docker build . --file Dockerfile --tag my-horacio:$(date +%s)
   
-send-sms:
-- name: 'Send SMS'
-  uses: seven-io/github-action-sms@master
-  with:
-    from: 'Tommy Tester'
-    text: 'OK letssss gooo ça marche bg'
-    to: '+33783601717,Horacio'
-  env:
-    SEVEN_API_KEY: '4MkFViZ2UdUaIbfZquju8BldsY5WSht1WlNLag2V4ZNApyYcC8zY0GsQwmkVAUmk'
+  send-sms:
+  - name: 'Send SMS'
+    uses: seven-io/github-action-sms@master
+    with:
+      from: 'Tommy Tester'
+      text: 'OK letssss gooo ça marche bg'
+      to: '+33783601717,Horacio'
+    env:
+      SEVEN_API_KEY: '4MkFViZ2UdUaIbfZquju8BldsY5WSht1WlNLag2V4ZNApyYcC8zY0GsQwmkVAUmk'
