@@ -18,20 +18,21 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       #- uses: stefanoeb/eslint-action@1.0.2
-    
+
   build:
     needs: eslint
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-horacio:$(date +%s)
-  
+      - uses: actions/checkout@v4
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag my-horacio:$(date +%s)
+
   send-sms:
-    - name: 'Send SMS'
-      uses: seven-io/github-action-sms@master
-      with:
-        from: 'Tommy Tester'
-        text: 'OK letssss gooo ça marche bg'
-        to: '+33783601717,Horacio'
-    
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Send SMS'
+        uses: seven-io/github-action-sms@master
+        with:
+          from: 'Tommy Tester'
+          text: 'OK letssss gooo ça marche bg'
+          to: '+33783601717,Horacio'
