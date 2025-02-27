@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  packages: write  # Permet de push sur GitHub Packages
 
 jobs:
   eslint:
@@ -16,22 +17,36 @@ jobs:
       - uses: actions/checkout@v4
       #- uses: stefanoeb/eslint-action@1.0.2
 
-  build:
+  build-and-push:
     needs: eslint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag my-horacio:$(date +%s)
+
+      - name: Connexion à GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+      - name: Build l'image Docker
+        run: |
+          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/my-horacio"
+          IMAGE_TAG="$(date +%s)"
+          docker build . --file Dockerfile --tag $IMAGE_NAME:$IMAGE_TAG
+          docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
+
+      - name: Push sur GitHub Container Registry
+        run: |
+          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/my-horacio"
+          IMAGE_TAG="$(date +%s)"
+          docker push $IMAGE_NAME:$IMAGE_TAG
+          docker push $IMAGE_NAME:latest
 
   send-sms:
-    needs: build
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
       - name: Send notification to Discord on success
         run: |
           curl -H "Content-Type: application/json" \
           -X POST \
-          -d '{"content": "✅ Jules : Build Réussie - ile AC Shattaland"}' \
+          -d '{"content": "✅ Jules : Build & Push Réussis - ile AC Shattaland"}' \
           https://discord.com/api/webhooks/1344596688450621491/6JGf73scKtZEqkvogpIRPFVzDc7bikWNmPOGrYd_oPd7j82_bo5PubhK_SoWJxv_OAse
-
