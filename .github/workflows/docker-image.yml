@@ -29,13 +29,12 @@ jobs:
 #    - name: Build the Docker image
 #      run: docker build . --file Dockerfile --tag my-horacio:$(date +%s)
   
-  send:
-#    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Sending SMS Notification'
-        uses: twilio-labs/actions-sms@v1
-        with:
-          fromPhoneNumber: '+14342150291'
-          toPhoneNumber: '+33783601717'
-          message: 'Salut bg le build de my-horacio est sur le repos' 
+send-sms:
+- name: 'Send SMS'
+  uses: seven-io/github-action-sms@master
+  with:
+    from: 'Tommy Tester'
+    text: 'OK letssss gooo ça marche bg'
+    to: '+33783601717,Horacio'
+  env:
+    SEVEN_API_KEY: '4MkFViZ2UdUaIbfZquju8BldsY5WSht1WlNLag2V4ZNApyYcC8zY0GsQwmkVAUmk'
