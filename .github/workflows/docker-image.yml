@@ -7,27 +7,25 @@ on:
     branches: [ "main" ]
 
 env:
-  TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-  TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
-  TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
+  SEVEN_API_KEY: '4MkFViZ2UdUaIbfZquju8BldsY5WSht1WlNLag2V4ZNApyYcC8zY0GsQwmkVAUmk'
 
 permissions:
   contents: read
 
 jobs:
-#  eslint:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v1
-#      #- uses: stefanoeb/eslint-action@1.0.2
-#    
-#  build:
-#    needs: eslint
-#    runs-on: ubuntu-latest
-#    steps:
-#    - uses: actions/checkout@v4
-#    - name: Build the Docker image
-#      run: docker build . --file Dockerfile --tag my-horacio:$(date +%s)
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      #- uses: stefanoeb/eslint-action@1.0.2
+    
+  build:
+    needs: eslint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-horacio:$(date +%s)
   
   send-sms:
     - name: 'Send SMS'
@@ -36,5 +34,4 @@ jobs:
         from: 'Tommy Tester'
         text: 'OK letssss gooo ça marche bg'
         to: '+33783601717,Horacio'
-    env:
-      SEVEN_API_KEY: '4MkFViZ2UdUaIbfZquju8BldsY5WSht1WlNLag2V4ZNApyYcC8zY0GsQwmkVAUmk'
+    
