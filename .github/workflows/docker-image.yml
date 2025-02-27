@@ -29,9 +29,8 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-horacio:$(date +%s)
   
-jobs:
-  needs: build
   send:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: 'Sending SMS Notification'
