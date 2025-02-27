@@ -6,15 +6,22 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+    TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+    TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+    TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
+
+permissions:
+  contents: read
+
 jobs:
   fake_tests:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [20.x, 22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
@@ -33,4 +40,13 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-horacio:$(date +%s)
   
-
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Sending SMS Notification'
+        uses: twilio-labs/actions-sms@v1
+        with:
+          FROM_PHONE_NUMBER: '+14342150291'
+          TO_PHONE_NUMBER: '+33783601717'
+          message: 'Salut bg le build de my-horacio est sur le repos'
