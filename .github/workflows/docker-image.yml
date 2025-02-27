@@ -36,6 +36,9 @@ jobs:
       - name: 'Sending SMS Notification'
         uses: twilio-labs/actions-sms@v1
         with:
-          FROM_PHONE_NUMBER: '+14342150291'
-          TO_PHONE_NUMBER: '+33783601717'
+          fromPhoneNumber: '+14342150291'
+          toPhoneNumber: '+33783601717'
           message: 'Salut bg le build de my-horacio est sur le repos'
+          TWILIO_ACCOUNT_SID: 'AC0becd613ff59be48cf4c44a6237f034c'
+          TWILIO_AUTH_TOKEN: 'f23f69509a0bc7ab4babe060361f03b4'
+          TWILIO_API_SECRET: 'EDpk8Yjd0hUu4oAE0LC9n6jWVatohwEs'
