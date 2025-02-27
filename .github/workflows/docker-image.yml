@@ -28,11 +28,12 @@ jobs:
         run: docker build . --file Dockerfile --tag my-horacio:$(date +%s)
 
   send-sms:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: 'Send SMS'
         uses: seven-io/github-action-sms@master
         with:
-          from: 'Tommy Tester'
+          from: 'Horacio'
           text: 'OK letssss gooo ça marche bg'
-          to: '+33783601717,Horacio'
+          to: '+33783601717'
