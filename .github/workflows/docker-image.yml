@@ -7,8 +7,8 @@ on:
     branches: [ "main" ]
 
 env:
-    TWILIO_ACCOUNT_SID: 'SK3c8ddc0a7f5c7bcaab3641f3a019b365'
-    TWILIO_AUTH_TOKEN: '4081e66314d65f6fc2812a150ddea394'
+    TWILIO_ACCOUNT_SID: 'AC0becd613ff59be48cf4c44a6237f034c'
+    TWILIO_AUTH_TOKEN: 'f23f69509a0bc7ab4babe060361f03b4'
     TWILIO_API_SECRET: 'EDpk8Yjd0hUu4oAE0LC9n6jWVatohwEs'
 
 permissions:
