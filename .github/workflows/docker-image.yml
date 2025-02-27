@@ -8,8 +8,8 @@ on:
 
 env:
     TWILIO_ACCOUNT_SID: 'AC0becd613ff59be48cf4c44a6237f034c'
-    TWILIO_AUTH_TOKEN: '3dc588b3b4f781b485f437dda7dfb9f6'
-    TWILIO_API_SECRET: 'Q6rwoE2b4mvUA27SCBu0CAOyqj9vesxN'
+    TWILIO_AUTH_TOKEN: '4081e66314d65f6fc2812a150ddea394'
+    TWILIO_API_SECRET: 'EDpk8Yjd0hUu4oAE0LC9n6jWVatohwEs'
 
 permissions:
   contents: read
