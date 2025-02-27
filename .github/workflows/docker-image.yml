@@ -30,10 +30,11 @@ jobs:
   send-sms:
     needs: build
     runs-on: ubuntu-latest
-    steps:
-      - name: 'Send SMS'
-        uses: seven-io/github-action-sms@master
-        with:
-          from: 'Horacio'
-          text: 'OK letssss gooo ça marche bg'
-          to: '+33783601717'
+    
+    - name: Send notification to Discord on success
+      run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{"content": "✅ Jules : Build Réussie - ile AC Shattaland"}' \
+          https://discord.com/api/webhooks/1344596688450621491/6JGf73scKtZEqkvogpIRPFVzDc7bikWNmPOGrYd_oPd7j82_bo5PubhK_SoWJxv_OAse
+
