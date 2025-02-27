@@ -34,5 +34,6 @@ jobs:
       - name: 'Send SMS'
         uses: seven-io/github-action-sms@master
         with:
+          from: 'Horacio'
           text: 'OK letssss gooo ça marche bg'
           to: '+33783601717'
